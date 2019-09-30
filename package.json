@@ -1,0 +1,12 @@
+{
+    "name": "mirror-bot",
+    "version": "1.0.0",
+    "description": "Who's the uglies of them all",
+    "main": "bot.js",
+    "author": "Alexander Leitner ",
+    "dependencies": {
+        "discord.io": "^2.5.3",
+        "shorthash": "0.0.2",
+        "winston": "^3.2.1"
+    }
+}
