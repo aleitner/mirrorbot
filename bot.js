@@ -1,48 +1,40 @@
-var Discord = require('discord.io');
-var logger = require('winston');
-var auth = require('./auth.json');
-var sh = require("shorthash");
-
-// Configure logger settings
-logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console, {
-    colorize: true
-});
-logger.level = 'debug';
+const Discord = require('discord.js');
+let sh = require("shorthash");
 
 // Initialize Discord Bot
-var bot = new Discord.Client({
-    token: auth.token,
-    autorun: true
+let client = new Discord.Client();
+
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}!`);
 });
 
-bot.on('ready', function (evt) {
-    logger.info('Connected');
-    logger.info('Logged in as: ');
-    logger.info(bot.username + ' - (' + bot.id + ')');
-});
+let whoRegEx = /^(m|M)irror (m|M)irror on the wall,? who(.+) of (them |us |\w?)?all/;
 
-const users = ['Alex', 'Jon', 'Delgado', 'Ada', 'Jose', 'Isaac', "Alfredo", 'Yancey', 'Dai', 'Jorge', 'Kargo', 'Rincon', 'Joe', 'Luis', 'Garçon', 'Mike']
-
-var whoRegEx = /^(m|M)irror (m|M)irror on the wall,? who(.+) of (them |us |\w?)?all/;
-
-bot.on('message', function (user, userID, channelID, message, evt) {
-    var found = message.match(whoRegEx);
+client.on('message', msg => {
+    let found = msg.content.match(whoRegEx);
     if (found !== null && found.length >= 4) {
-        var description = found[3]
+
+        let description = found[3]
         let id = String2Hex(sh.unique(description.toLowerCase())).replace(/\D/g, '');
-        console.log(id)
-        console.log(id % users.length);
-        bot.sendMessage({
-            to: channelID,
-            message: `${users[id % users.length]}${description} of them all`
-        });
+        let count = 0;
+        let user = id % msg.guild.memberCount;
+
+        msg.guild.members.forEach(function (value, key, map) {
+            count++;
+            if (user != count) {
+                return;
+            }
+
+            msg.channel.send('<@'+value.user.id+'>'+description+' of them all')
+        })
     }
 });
 
+client.login(process.env.BOT_TOKEN);
+
 function String2Hex(tmp) {
-    var str = '';
-    for (var i = 0; i < tmp.length; i++) {
+    let str = '';
+    for (let i = 0; i < tmp.length; i++) {
         str += tmp[i].charCodeAt(0).toString(16);
     }
     return str;
