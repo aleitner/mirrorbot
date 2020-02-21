@@ -21,7 +21,7 @@ client.on('message', msg => {
 
         msg.guild.members.forEach(function (value, key, map) {
             count++;
-            if (user != count) {
+            if (user != (count-1)) {
                 return;
             }
 
